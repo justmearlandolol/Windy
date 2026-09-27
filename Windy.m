@@ -99,7 +99,7 @@ static NSString *WindyReadableSize(unsigned long long bytes) {
 }
 
 - (void)restartVideo:(NSNotification *)notification {
-    [self.player seekToTime:kCMTimeZero completionHandler:^(BOOL finished) {
+    [self.player seekToTime:CMTimeMake(0, 1) completionHandler:^(BOOL finished) {
         if (finished) {
             [self.player play];
         }
