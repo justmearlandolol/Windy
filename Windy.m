@@ -62,11 +62,8 @@ static NSString *WindyReadableSize(unsigned long long bytes) {
 - (WKWebView *)makeWebView {
     WKWebViewConfiguration *configuration = [[WKWebViewConfiguration alloc] init];
     configuration.mediaTypesRequiringUserActionForPlayback = WKAudiovisualMediaTypeNone;
-    configuration.allowsInlineMediaPlayback = YES;
     WKWebView *webView = [[WKWebView alloc] initWithFrame:self.bounds configuration:configuration];
     webView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
-    webView.drawsBackground = NO;
-    webView.opaque = NO;
     return webView;
 }
 
@@ -172,7 +169,7 @@ static NSString *WindyReadableSize(unsigned long long bytes) {
 }
 
 - (NSString *)logoHTML {
-    return [NSString stringWithFormat:@"<!doctype html><html><head><style>html,body{width:100%%;height:100%%;margin:0;overflow:hidden;background:transparent}svg{width:100%%;height:100%%;display:block}</style></head><body>%@</body></html>", WindyLogoSVG()];
+    return [NSString stringWithFormat:@"<!doctype html><html><head><style>html,body{width:100%%;height:100%%;margin:0;overflow:hidden;background:#1b1526}svg{width:100%%;height:100%%;display:block}</style></head><body>%@</body></html>", WindyLogoSVG()];
 }
 
 - (void)buildWindow {
@@ -193,8 +190,6 @@ static NSString *WindyReadableSize(unsigned long long bytes) {
 
     WKWebViewConfiguration *logoConfiguration = [[WKWebViewConfiguration alloc] init];
     WKWebView *logoView = [[WKWebView alloc] initWithFrame:NSMakeRect(38, 292, 100, 86) configuration:logoConfiguration];
-    logoView.drawsBackground = NO;
-    logoView.opaque = NO;
     [logoView loadHTMLString:[self logoHTML] baseURL:nil];
     [contentView addSubview:logoView];
 
