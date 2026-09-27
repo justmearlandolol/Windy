@@ -21,6 +21,17 @@ static NSString *WindyReadableSize(unsigned long long bytes) {
     return [NSString stringWithFormat:@"%llu bytes", bytes];
 }
 
+static NSURL *WindyLocalCopy(NSURL *url) {
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSURL *sourceDirectory = [url URLByDeletingLastPathComponent];
+    NSURL *destinationDirectory = [[NSURL fileURLWithPath:NSTemporaryDirectory()] URLByAppendingPathComponent:[[NSProcessInfo processInfo] globallyUniqueString]];
+    NSError *error = nil;
+    if (![fileManager copyItemAtURL:sourceDirectory toURL:destinationDirectory error:&error]) {
+        return url;
+    }
+    return [destinationDirectory URLByAppendingPathComponent:url.lastPathComponent];
+}
+
 @interface WindyWallpaperView : NSView
 @property (nonatomic, strong) WKWebView *webView;
 @property (nonatomic, strong) AVPlayer *player;
@@ -74,16 +85,18 @@ static NSString *WindyReadableSize(unsigned long long bytes) {
     if ([extension isEqualToString:@"html"] || [extension isEqualToString:@"htm"]) {
         self.webView = [self makeWebView];
         [self addSubview:self.webView];
-        NSURL *directoryURL = [url URLByDeletingLastPathComponent];
-        [self.webView loadFileURL:url allowingReadAccessToURL:directoryURL];
+        NSURL *localURL = WindyLocalCopy(url);
+        NSURL *directoryURL = [localURL URLByDeletingLastPathComponent];
+        [self.webView loadFileURL:localURL allowingReadAccessToURL:directoryURL];
         return;
     }
     if ([extension isEqualToString:@"gif"]) {
         self.webView = [self makeWebView];
         [self addSubview:self.webView];
-        NSString *source = url.absoluteString;
+        NSURL *localURL = WindyLocalCopy(url);
+        NSString *source = localURL.absoluteString;
         NSString *document = [NSString stringWithFormat:@"<!doctype html><html><head><style>html,body{width:100%%;height:100%%;margin:0;overflow:hidden;background:#000}img{width:100%%;height:100%%;display:block;object-fit:cover}</style></head><body><img src=\"%@\"></body></html>", source];
-        [self.webView loadHTMLString:document baseURL:[url URLByDeletingLastPathComponent]];
+        [self.webView loadHTMLString:document baseURL:[localURL URLByDeletingLastPathComponent]];
         return;
     }
     self.playerItem = [AVPlayerItem playerItemWithURL:url];
